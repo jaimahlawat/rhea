@@ -1,23 +1,6 @@
 // Initialize configuration
 const config = window.VALENTINE_CONFIG;
 
-// --- AUTOPLAY FIX FOR RHEA ---
-// Browsers block audio until a user clicks something. 
-// This triggers the music the second she starts the experience.
-window.addEventListener('click', () => {
-    const bgMusic = document.getElementById('bgMusic');
-    const musicToggle = document.getElementById('musicToggle');
-    const config = window.VALENTINE_CONFIG;
-
-    if (config.music.enabled && bgMusic.paused) {
-        bgMusic.play().then(() => {
-            musicToggle.textContent = config.music.stopText;
-        }).catch(error => {
-            console.log("Playback still blocked or loading...");
-        });
-    }
-}, { once: true }); // This ensures it only runs on the first click
-
 // Validate configuration
 function validateConfig() {
     const warnings = [];
@@ -218,36 +201,76 @@ function createHeartExplosion() {
 }
 
 // Music Player Setup
+// function setupMusicPlayer() {
+//     const musicControls = document.getElementById('musicControls');
+//     const musicToggle = document.getElementById('musicToggle');
+//     const bgMusic = document.getElementById('bgMusic');
+//     const musicSource = document.getElementById('musicSource');
+
+//     // Only show controls if music is enabled in config
+//     if (!config.music.enabled) {
+//         musicControls.style.display = 'none';
+//         return;
+//     }
+
+//     // Set music source and volume
+//     musicSource.src = config.music.musicUrl;
+//     bgMusic.volume = config.music.volume || 0.5;
+//     bgMusic.load();
+
+//     // Try autoplay if enabled
+//     if (config.music.autoplay) {
+//         const playPromise = bgMusic.play();
+//         if (playPromise !== undefined) {
+//             playPromise.catch(error => {
+//                 console.log("Autoplay prevented by browser");
+//                 musicToggle.textContent = config.music.startText;
+//             });
+//         }
+//     }
+
+//     // Toggle music on button click
+//     musicToggle.addEventListener('click', () => {
+//         if (bgMusic.paused) {
+//             bgMusic.play();
+//             musicToggle.textContent = config.music.stopText;
+//         } else {
+//             bgMusic.pause();
+//             musicToggle.textContent = config.music.startText;
+//         }
+//     });
+// } 
+
 function setupMusicPlayer() {
     const musicControls = document.getElementById('musicControls');
     const musicToggle = document.getElementById('musicToggle');
     const bgMusic = document.getElementById('bgMusic');
     const musicSource = document.getElementById('musicSource');
 
-    // Only show controls if music is enabled in config
     if (!config.music.enabled) {
         musicControls.style.display = 'none';
         return;
     }
 
-    // Set music source and volume
     musicSource.src = config.music.musicUrl;
     bgMusic.volume = config.music.volume || 0.5;
     bgMusic.load();
 
-    // Try autoplay if enabled
-    if (config.music.autoplay) {
-        const playPromise = bgMusic.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Autoplay prevented by browser");
-                musicToggle.textContent = config.music.startText;
-            });
+    // 1. Create a helper to start the music
+    const startAudio = () => {
+        if (bgMusic.paused) {
+            bgMusic.play().then(() => {
+                musicToggle.textContent = config.music.stopText;
+            }).catch(e => console.log("Autoplay blocked, waiting for interaction."));
         }
-    }
+    };
 
-    // Toggle music on button click
-    musicToggle.addEventListener('click', () => {
+    // 2. This is the key: Start music on the very first click anywhere
+    document.addEventListener('click', startAudio, { once: true });
+
+    // 3. Keep manual toggle functionality
+    musicToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevents the 'click' listener above from firing twice
         if (bgMusic.paused) {
             bgMusic.play();
             musicToggle.textContent = config.music.stopText;
@@ -256,4 +279,4 @@ function setupMusicPlayer() {
             musicToggle.textContent = config.music.startText;
         }
     });
-} 
+}
