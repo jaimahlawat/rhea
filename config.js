@@ -57,7 +57,7 @@ const CONFIG = {
     music: {
         enabled: true,                     
         autoplay: true,                    
-        musicUrl: "https://res.cloudinary.com/dncywqfpb/video/upload/v1738399057/music_qrhjvy.mp3", 
+        musicUrl: "https://res.cloudinary.com/dz6h8izpa/video/upload/v1769954514/Olivia-Dean---Man-I-Need-Bazeafrika.com_jza3xz.mp3", 
         startText: "🎵 Our Song",        
         stopText: "🔇 Mute",         
         volume: 0.5                        
