@@ -1,6 +1,23 @@
 // Initialize configuration
 const config = window.VALENTINE_CONFIG;
 
+// --- AUTOPLAY FIX FOR RHEA ---
+// Browsers block audio until a user clicks something. 
+// This triggers the music the second she starts the experience.
+window.addEventListener('click', () => {
+    const bgMusic = document.getElementById('bgMusic');
+    const musicToggle = document.getElementById('musicToggle');
+    const config = window.VALENTINE_CONFIG;
+
+    if (config.music.enabled && bgMusic.paused) {
+        bgMusic.play().then(() => {
+            musicToggle.textContent = config.music.stopText;
+        }).catch(error => {
+            console.log("Playback still blocked or loading...");
+        });
+    }
+}, { once: true }); // This ensures it only runs on the first click
+
 // Validate configuration
 function validateConfig() {
     const warnings = [];
